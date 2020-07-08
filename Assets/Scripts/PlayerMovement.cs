@@ -2,12 +2,14 @@
 
 public class PlayerMovement : MonoBehaviour
 {
-
     public float moveSpeed;
+    public float climbSpeed;
     public float jumpForce;
 
     private bool isJumping;
     private bool isGrounded;
+    [HideInInspector]
+    public bool isClimbing;
 
     public Transform groundCheck;
     public float groundCheckRadius;
@@ -19,11 +21,13 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 velocity = Vector3.zero;
     private float horizontalMovement;
+    private float verticalMovement;
 
     private void Update()
     {
         //Calcul de la vitesse de deplacement
         horizontalMovement = Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime;
+        verticalMovement = Input.GetAxis("Vertical") * climbSpeed * Time.fixedDeltaTime;
 
         //Si on appuie sur le bouton de saut et que le personnage est au sol
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -38,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
         //Pour apliquer la vitesse à l'animation, on récupère la valeur absolue de la vitesse du RigedBody (vitesse négative si on va vers la gauche)
         float characterVelocity = Mathf.Abs(rb.velocity.x);
         animator.SetFloat("Speed", characterVelocity);
+        animator.SetBool("isClimbing", isClimbing);
     }
 
     //Pas de récupération de Input dans la fonction fixedUpdate, toujours dans Update
@@ -48,21 +53,28 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, collisionLayer);
         
         //Déplacement du joueur
-        MovePlayer(horizontalMovement);
+        MovePlayer(horizontalMovement, verticalMovement);
     }
 
-    void MovePlayer(float _horizontalMovement)
+    void MovePlayer(float _horizontalMovement, float _verticalMovement)
     {
-        //Création du vecteur de déplacement avec la force de mouvement et la vitesse verticale reste inchangée (pour les sauts par ex.)
-        Vector3 targetVelocity = new Vector2(_horizontalMovement, rb.velocity.y);
-        //Application de la vitesse de déplacement au personnage
-        rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, 0.05f);
-
-        if (isJumping)
+        if (!isClimbing)
         {
-            //Application d'une force verticale sur le joueur pour le saut
-            rb.AddForce(new Vector2(0f, jumpForce));
-            isJumping = false;
+            //Création du vecteur de déplacement avec la force de mouvement et la vitesse verticale reste inchangée (pour les sauts par ex.)
+            Vector3 targetVelocity = new Vector2(_horizontalMovement, rb.velocity.y);
+            //Application de la vitesse de déplacement au personnage
+            rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, 0.05f);
+
+            if (isJumping)
+            {
+                //Application d'une force verticale sur le joueur pour le saut
+                rb.AddForce(new Vector2(0f, jumpForce));
+                isJumping = false;
+            }
+        } else
+        {
+            Vector3 targetVelocity = new Vector2(0f, _verticalMovement);
+            rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, 0.05f);
         }
     }
 
