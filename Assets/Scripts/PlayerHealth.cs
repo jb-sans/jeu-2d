@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -13,6 +12,18 @@ public class PlayerHealth : MonoBehaviour
 
     public SpriteRenderer graphics;
     public HealthBar healthBar;
+
+    public static PlayerHealth instance;
+
+    private void Awake()
+    {
+        if (instance != null)
+        {
+            Debug.LogWarning("Plus d'une instance de PlayerHealth dans scène");
+            return;
+        }
+        instance = this;
+    }
 
     void Start()
     {
@@ -28,9 +39,21 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    public void HealPlayer(int amount)
+    {
+        if((currentHealth + amount) > maxHealth)
+        {
+            currentHealth = maxHealth;
+        } else
+        {
+            currentHealth += amount;
+        }
+        healthBar.SetHealth(currentHealth);
+    }
+
     public void TakeDamage(int damage)
     {
-        if (!isInvincible)
+        if(!isInvincible)
         {
             currentHealth -= damage;
             healthBar.SetHealth(currentHealth);
