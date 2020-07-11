@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour
            
         if (isGrounded == true)
         {
-            GrvtCounter = 2;
+            GrvtCounter = 1;
         }
 
         if (Input.GetButtonDown("Jump"))
@@ -64,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("Speed", characterVelocity);
 
         // Stack pour le changement de gravité \\
-        if (Input.GetButtonDown("Jump") && GrvtCounter == 0)
+        if (Input.GetButtonDown("Jump") && GrvtCounter == 0 && isGrounded == false)
         {
             rb.gravityScale *= -1;
             FlipY();
