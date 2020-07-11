@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (instance != null)
         {
-            Debug.LogWarning("Plus d'une instance de PlayerHealth dans scène");
+            Debug.LogWarning("Plus d'une instance de PlayerMovement dans scène");
             return;
         }
         instance = this;
@@ -43,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
         verticalMovement = Input.GetAxis("Vertical") * climbSpeed * Time.fixedDeltaTime;
 
         //Si on appuie sur le bouton de saut et que le personnage est au sol
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump") && isGrounded && !isClimbing)
         {
             //Le personnage peut sauter
             isJumping = true;
