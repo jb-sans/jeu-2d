@@ -20,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public CapsuleCollider2D playerCollider;
 
-    private Vector3 velocity = Vector3.zero;
+    public Vector3 velocity = Vector3.zero;
     private float horizontalMovement;
     private float verticalMovement;
 
@@ -64,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
     {
         //Traçage une ligne entre groundCheckLeft et groundCheckRight pour voir si cette ligne touche le sol
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, collisionLayer);
-        
+
         //Déplacement du joueur
         MovePlayer(horizontalMovement, verticalMovement);
     }
@@ -84,7 +84,8 @@ public class PlayerMovement : MonoBehaviour
                 rb.AddForce(new Vector2(0f, jumpForce));
                 isJumping = false;
             }
-        } else
+        }
+        else
         {
             Vector3 targetVelocity = new Vector2(0f, _verticalMovement);
             rb.velocity = Vector3.SmoothDamp(rb.velocity, targetVelocity, ref velocity, 0.05f);
@@ -98,8 +99,9 @@ public class PlayerMovement : MonoBehaviour
         {
             //Changement de l'orientation vers la droite
             spriteRenderer.flipX = false;
-        //Sinon, si on va vers la gauche
-        } else if (_velocity < -0.1f)
+            //Sinon, si on va vers la gauche
+        }
+        else if (_velocity < -0.1f)
         {
             //Changement de l'orientation vers la gauche
             spriteRenderer.flipX = true;
@@ -111,6 +113,23 @@ public class PlayerMovement : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+    }
+
+    public void StopPlayer()
+    {
+        this.enabled = false;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.velocity = Vector3.zero;
+        playerCollider.enabled = false;
+
+    }
+
+    public void UnstopPlayer()
+    {
+        this.enabled = true;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        playerCollider.enabled = true;
+
     }
 
 }

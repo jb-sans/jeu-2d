@@ -21,8 +21,10 @@ public class DeathZone : MonoBehaviour
 
     private IEnumerator ReplacePlayer(Collider2D collision)
     {
+        CameraFollow.instance.isFollowingPlayer = false;
         fadeSystem.SetTrigger("FadeIn");
         yield return new WaitForSeconds(1f);
+        CameraFollow.instance.isFollowingPlayer = true;
         collision.transform.position = playerSpawn.position;
     }
 
