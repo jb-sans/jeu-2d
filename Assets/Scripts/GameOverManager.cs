@@ -40,7 +40,9 @@ public class GameOverManager : MonoBehaviour
 
     public void MainMenuButton()
     {
-
+        //Fait en sorte de ne garder aucun objet quand on va sur le menu
+        DontDestroyOnLoadScene.instance.RemoveFromDontDestroyOnLoad();
+        SceneManager.LoadScene("MainMenu");
     }
 
     public void QuitButton()
