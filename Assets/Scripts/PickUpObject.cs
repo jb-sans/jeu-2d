@@ -1,5 +1,4 @@
-﻿using UnityEditor.Experimental.AssetImporters;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PickUpObject : MonoBehaviour
 {
@@ -8,6 +7,7 @@ public class PickUpObject : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             Inventory.instance.AddCoins(1);
+            CurrentSceneManager.instance.coinsPickedUpInThisSceneCount++;
             Destroy(gameObject);
         }
     }
