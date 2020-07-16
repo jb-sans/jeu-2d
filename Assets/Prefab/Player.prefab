@@ -100,9 +100,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d67d34296dcd4374889000a84d64aa7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 250
-  jumpForce: 300
+  moveSpeed: 300
+  jumpForce: 400
+  downForce: 0
   groundCheck: {fileID: 8302538920475239483}
+  groundCheckTop: {fileID: 0}
   groundCheckRadius: 0.4
   collisionLayer:
     serializedVersion: 2
@@ -110,6 +112,7 @@ MonoBehaviour:
   rb: {fileID: 8302538920371621350}
   animator: {fileID: 8302538920371621355}
   spriteRenderer: {fileID: 8302538920371621352}
+  GrvtCounter: 0
 --- !u!50 &8302538920371621350
 Rigidbody2D:
   serializedVersion: 4
@@ -122,10 +125,10 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 1.1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 1.8
   m_Material: {fileID: 0}
   m_Interpolate: 2
   m_SleepingMode: 1
