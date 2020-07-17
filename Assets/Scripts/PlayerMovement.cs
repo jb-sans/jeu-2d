@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     public bool isClimbing;
 
     public Transform groundCheck;
+    public Transform groundCheckTop;
     public float groundCheckRadius;
     public LayerMask collisionLayer;
 
@@ -23,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 velocity = Vector3.zero;
     private float horizontalMovement;
     private float verticalMovement;
+
+    public int GrvtCounter;
 
     public static PlayerMovement instance;
 
@@ -42,6 +45,26 @@ public class PlayerMovement : MonoBehaviour
         horizontalMovement = Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime;
         verticalMovement = Input.GetAxis("Vertical") * climbSpeed * Time.fixedDeltaTime;
 
+        //Si le personnage est à terre
+        if (isGrounded)
+        {
+            //Le compteur est mis à 1
+            GrvtCounter = 1;
+        }
+
+        //Si le personnage saute, on décrémente
+        if (Input.GetButtonDown("Jump"))
+        {
+            GrvtCounter--;
+        }
+
+        // Stack pour le changement de gravité \\
+        if (Input.GetButtonDown("Jump") && GrvtCounter == 0 && !isGrounded)
+        {
+            rb.gravityScale *= -1;
+            FlipY();
+        }
+
         //Si on appuie sur le bouton de saut et que le personnage est au sol
         if (Input.GetButtonDown("Jump") && isGrounded && !isClimbing)
         {
@@ -50,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //On change l'orientation (gauche ou droite) du personnage
-        Flip(rb.velocity.x);
+        FlipX(rb.velocity.x);
 
         //Pour apliquer la vitesse à l'animation, on récupère la valeur absolue de la vitesse du RigedBody (vitesse négative si on va vers la gauche)
         float characterVelocity = Mathf.Abs(rb.velocity.x);
@@ -62,8 +85,10 @@ public class PlayerMovement : MonoBehaviour
     //Ici, on fait que ce qui concerne la physique
     void FixedUpdate()
     {
-        //Traçage une ligne entre groundCheckLeft et groundCheckRight pour voir si cette ligne touche le sol
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, collisionLayer);
+        //Traçage d'un cercle de centre groundCheck ou groundCheckTop pour voir si le cercle touche le sol 
+        bool gCB = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, collisionLayer);
+        bool gCT = Physics2D.OverlapCircle(groundCheckTop.position, groundCheckRadius, collisionLayer);
+        isGrounded = gCB || gCT;
 
         //Déplacement du joueur
         MovePlayer(horizontalMovement, verticalMovement);
@@ -80,9 +105,15 @@ public class PlayerMovement : MonoBehaviour
 
             if (isJumping)
             {
-                //Application d'une force verticale sur le joueur pour le saut
-                rb.AddForce(new Vector2(0f, jumpForce));
-                isJumping = false;
+                if(rb.gravityScale > 0.1f )
+                {
+                    //Application d'une force verticale sur le joueur pour le saut
+                    rb.AddForce(new Vector2(0f, jumpForce));
+                } else if (rb.gravityScale < 0.1f)
+                {
+                    rb.AddForce(new Vector2(0f, -jumpForce));
+                }
+                    isJumping = false;
             }
         }
         else
@@ -92,7 +123,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void Flip(float _velocity)
+    void FlipX(float _velocity)
     {
         //Si on va vers la droite
         if (_velocity > 0.1f)
@@ -109,10 +140,24 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    void FlipY()
+    {
+        if (rb.gravityScale < 0.1f)
+        {
+            spriteRenderer.flipY = true;
+        }
+        else if(rb.gravityScale > -0.1f)
+        {
+            spriteRenderer.flipY = false;
+        }
+
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+        Gizmos.DrawWireSphere(groundCheckTop.position, groundCheckRadius);
     }
 
     public void StopPlayer()
